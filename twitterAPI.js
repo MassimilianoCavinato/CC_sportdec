@@ -11,11 +11,17 @@ const TwitterClient = new Twitter({
 module.exports = {
 
   getTweets: function(question){
-
-    encodeURI(question);
+      //It is quite hard to get tweets about github small projects,
+      //I tweeted about this repo from my own twitter account to test the functionality of this program.
+      //I used hashtags, twittercards, normal comments and url links and yet I can't get my own tweets!.
+      //It seems to work well on bigger repos like ExpressJs, NodeJs etc..
+      //TwitterClient encodes query parameters by default.
+    console.log(question);
     return TwitterClient.get('search/tweets.json', {
         q: question,
-        lang: 'eu',
+        count: 10,
+        result_type: 'recent',
+        include_entities: false
     });
   }
 }

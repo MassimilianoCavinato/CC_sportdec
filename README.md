@@ -45,5 +45,10 @@ This command will fetch 3 repos about tennis on the fifth page of the github sea
 
 ### Limits:
 This program has API rate and query limits relative to Github and Twitter APIs.
-Whenever theses limits are hit the full response/error with status code will be parsed to the summary, and tweets objects of each repo.
+
+Whenever these limits are hit the full response/error with status code will be parsed to the summary, and tweets objects of each repo.
+
 Rate limiting is explained in the Github and Twitter API documentation.
+
+### Tweets completeness:
+As specified in the Twitter documentation

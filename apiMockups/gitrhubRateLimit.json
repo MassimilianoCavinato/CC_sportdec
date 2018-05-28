@@ -1,0 +1,48 @@
+{
+  "statusCode": 200,
+  "body": "{\"resources\":{\"core\":{\"limit\":60,\"remaining\":39,\"reset\":1527521072},\"search\":{\"limit\":10,\"remaining\":10,\"reset\":1527520009},\"graphql\":{\"limit\":0,\"remaining\":0,\"reset\":1527523549}},\"rate\":{\"limit\":60,\"remaining\":39,\"reset\":1527521072}}",
+  "headers": {
+    "server": "GitHub.com",
+    "date": "Mon, 28 May 2018 15:05:49 GMT",
+    "content-type": "application/json; charset=utf-8",
+    "content-length": "234",
+    "connection": "close",
+    "status": "200 OK",
+    "x-ratelimit-limit": "60",
+    "x-ratelimit-remaining": "39",
+    "x-ratelimit-reset": "1527521072",
+    "cache-control": "no-cache",
+    "x-github-media-type": "github.v3; param=object",
+    "access-control-expose-headers": "ETag, Link, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval",
+    "access-control-allow-origin": "*",
+    "strict-transport-security": "max-age=31536000; includeSubdomains; preload",
+    "x-frame-options": "deny",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "origin-when-cross-origin, strict-origin-when-cross-origin",
+    "content-security-policy": "default-src 'none'",
+    "x-runtime-rack": "0.011319",
+    "x-github-request-id": "CC64:02B2:3F9B2A6:8FF5992:5B0C1ACD"
+  },
+  "request": {
+    "uri": {
+      "protocol": "https:",
+      "slashes": true,
+      "auth": null,
+      "host": "api.github.com",
+      "port": 443,
+      "hostname": "api.github.com",
+      "hash": null,
+      "search": null,
+      "query": null,
+      "pathname": "/rate_limit",
+      "path": "/rate_limit",
+      "href": "https://api.github.com/rate_limit"
+    },
+    "method": "GET",
+    "headers": {
+      "User-agent": "CC_sportedec",
+      "Accept": "application/vnd.github.v3.object"
+    }
+  }
+}
