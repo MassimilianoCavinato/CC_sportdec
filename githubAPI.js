@@ -9,7 +9,7 @@ module.exports = {
     userAgent: 'CC_sportedec',
 
     getRateLimit: function(){
-
+        
         let url = "https://api.github.com/rate_limit";
         let options = {
             method: 'GET',

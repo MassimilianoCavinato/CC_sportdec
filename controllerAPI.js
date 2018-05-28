@@ -1,5 +1,5 @@
 "use strict";
-const minimist = require('minimist');
+
 const githubAPI = require('./githubAPI');
 const twitterAPI = require('./twitterAPI');
 
@@ -11,7 +11,6 @@ module.exports = {
         // -k, "Football" => keyword
         // -p, 1 => page
         // -c, 10 => per_page
-
         return {
             keyword: this.getKeyword(argv), // "Football"
             page: this.getPage(argv), // 1
@@ -49,6 +48,7 @@ module.exports = {
             if(this.githubRateLimit_OK(res, per_page)){
 
                 return githubAPI.getReposByKeyword(keyword, page, per_page).then((res) => {
+                    return res;
                     let repoItems = JSON.parse(res.body).items;
                     //The fastest way to reduce response time: tonitiate the 2 promises: summary and tweets, then..
                     //once both are resolved (resolving in parallel) use map to assign results to each repo leveraging on the index,
