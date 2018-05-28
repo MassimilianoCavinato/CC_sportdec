@@ -31,7 +31,6 @@ module.exports = {
             if(res.statusCode === 200){
                 return githubAPI.getReposByKeyword(keyword, page, per_page).then((res) => {
                     let repoItems = JSON.parse(res.body).items;
-                    return repoItems;
                     let summaries = this.getListOfSummaries(repoItems);
                     let tweets = this.getListOfTweets(repoItems);
                     return Promise.all([summaries, tweets]).then((res) => {
