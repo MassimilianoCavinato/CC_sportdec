@@ -1,35 +1,55 @@
 "use strict";
+const minimist = require('minimist');
 const githubAPI = require('./githubAPI');
 const twitterAPI = require('./twitterAPI');
 
 module.exports = {
 
-    parseArgv: function(){
+    parseArgv: function(argv){
 
-        //just parsing optional arguments that might be or not be passed when the script is invoked
+        // parsing optional arguments, defaults to:
+        // -k, "Football" => keyword
+        // -p, 1 => page
+        // -c, 10 => per_page
 
-        let keyword = process.argv[2] || "Football";
-        let page = parseInt(process.argv[3]) || 1;
-        let per_page =  parseInt(process.argv[4]) || 10;
-
-        if(per_page < 1 || per_page > 10){ per_page = 10;}
-        if(page*per_page > 1000){page = 1;} //searching more than 1000 results will throw an error and dryout the remining APIs
-
-        let result = {
-            keyword: keyword,
-            page: page,
-            per_page: per_page
-        };
-        // console.log(result);
-        return result;
+        return {
+            keyword: this.getKeyword(argv), // "Football"
+            page: this.getPage(argv), // 1
+            per_page: this.getPerPage(argv), //10
+        }
     },
-
+    getKeyword(argv){
+        // get the -k option or "Football"
+        let keyword = argv.k || 'Football';
+        if(typeof keyword !== 'string'){
+            keyword = 'Football';
+        }
+        return keyword;
+    },
+    getPage(argv){
+        // get the -p option or 1
+        let page = parseInt(argv.p, 10) || 1;
+        if(typeof page !== 'number'){
+            page = 1;
+        }
+        return page;
+    },
+    getPerPage(argv){
+        // get the -c option or 10
+        let per_page = parseInt(argv.c, 10) || 10;
+        if(typeof per_page !== 'number'){
+            per_page = 10;
+        }
+        return per_page;
+    },
     CC_sportdec: function(keyword, page, per_page){
 
         return githubAPI.getRateLimit().then((res) => {
+
             if(this.githubRateLimit_OK(res, per_page)){
+
                 return githubAPI.getReposByKeyword(keyword, page, per_page).then((res) => {
-                    let repoItems = JSON.parse(res.body).items || [];
+                    let repoItems = JSON.parse(res.body).items;
                     //The fastest way to reduce response time: tonitiate the 2 promises: summary and tweets, then..
                     //once both are resolved (resolving in parallel) use map to assign results to each repo leveraging on the index,
                     //there are no push or pops therefore I can assume that it will work 100%
@@ -38,6 +58,7 @@ module.exports = {
                     //The most expensive computation is getting the readme,
                     //tested with 20 repos and worst result to resolve both promises was 898 ms from home connection
                     return Promise.all([summaries, tweets]).then((res) => {
+                        //zipping repos summaries and tweets
                         return repoItems.map((repo, index) => {
                             let summary =  res[0][index];
                             let tweets = res[1][index];
@@ -49,42 +70,39 @@ module.exports = {
                     return res;
                 }).catch((err) => err);
             }
-            return res; //if githubRateLimit_OK is false;
+
+            return res; //if githubRateLimit_OK === false;
         }).catch((err) => {
             return err;
         });
-
-        //
-        // console.log(githubRateLimit_OK);
-
-
     },
     githubRateLimit_OK: function(res, per_page){
-        //Github rate limit api doesn't affect the remaining API counter, however,
-        //before messing up with unwanted responses I think it is beneficial to make
-        //some simple checks:
+
+        // Github rate limit api doesn't affect the remaining API counter,
+
+        // Doing 3 checks:
         // 1) I want to make sure I have reached the github endpoint in the previous call
-        // 2) I want to make sure I have at least 1 search API left to perform the first search
-        // 3) I want to make sure I have enough core APIs to fetch the README files later on
+        // 2) I want to make sure I have at least 1 search API left to run the repo search
+        // 3) I want to make sure I have enough core APIs to fetch the README files later on,
         let search_remaining = JSON.parse(res.body).resources.search.remaining > 0 || 0; //something unexpected?
         let core_remaining = JSON.parse(res.body).resources.core.remaining || 0; //something unexpected?
-        console.log('search_remaining', search_remaining > 0);
-        console.log('core_remaining', core_remaining >= per_page);
+        // console.log('search_remaining', search_remaining > 0);
+        // console.log('core_remaining', core_remaining >= per_page);
         return res.statusCode === 200 && search_remaining > 0 && core_remaining >= per_page; //boolean
     },
     getListOfSummaries: async function(repoItems){
 
         let start = Date.now();
+        console.log("GET LIST OF SUMMARIES STARTED AT", start);
         let summaries = repoItems.map((repo) => {
-            return githubAPI.getRepoSummary(repo.owner.login, repo.name);
-            // .then((res) => {
-            //     console.log("summary ok", repo.name, (Date.now() - start), "ms");
-            //     return JSON.parse(res.response.body);
-            // })
-            // .catch((err) => {
-            //     console.log("summary error", repo.name, (Date.now() - start), "ms");
-            //     return "";
-            // });
+            return githubAPI.getRepoSummary(repo.owner.login, repo.name).then((res) => {
+                console.log("summary ok", repo.name, (Date.now() - start), "ms");
+                return res.body;
+            }).catch((err) => {
+                console.log("summary error", repo.name, (Date.now() - start), "ms");
+                return false;
+                //doing this so that the front-end can do something like if(summary){...}else{...}
+            });
         });
 
         return Promise.all(summaries);
@@ -92,19 +110,22 @@ module.exports = {
     getListOfTweets: async function(repoItems){
 
         let start = Date.now();
+        console.log("GET LIST OF TWEETS STARTED AT", start);
         let tweets = repoItems.map((repo) => {
             let question = repo.owner.login+'/'+repo.name;
-            return twitterAPI.getTweets(question);
-            // .then((res) => {
-            //     console.log("tweets ok", repo.owner.login, repo.name, (Date.now() - start), "ms");
-            //     return res.statuses;
-            // })
-            // .catch((err) => {
-            //     console.log("tweets error", repo.owner.login, repo.name,  (Date.now() - start), "ms");
-            //     return [];
-            // });
+            return twitterAPI.getTweets(question).then((res) => {
+                console.log("tweets ok", repo.owner.login, repo.name, (Date.now() - start), "ms");
+                return res.statuses;
+                //if api requests are finished this will be catched as an error
+            })
+            .catch((err) => {
+                console.log("tweets error", repo.owner.login, repo.name,  (Date.now() - start), "ms");
+                console.log(err);
+                return false;
+                //doing this so that the front-end can do something like if(tweets){...}else{...}
+           });
         });
-        console.log(tweets);
+
         return Promise.all(tweets);
     }
 }

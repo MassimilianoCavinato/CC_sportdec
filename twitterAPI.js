@@ -1,5 +1,4 @@
 "use strict";
-
 const Twitter = require('twitter');
 const TwitterClient = new Twitter({
   consumer_key:  process.env.TWITTER_API_KEY,
