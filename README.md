@@ -41,7 +41,7 @@ Example with flags: (fetch 7 repos about tennis from the 3rd search page in gith
 node index.js -k Tennis -c 7 -p 3
 ```
 
-once the script has run, the server will serve  the response at http://localhost:3000/CC_sportec
+once the script has run, the server will serve  the response at http://localhost:3000/CC_sportdec
 
 
 ### Limits:
@@ -52,4 +52,5 @@ Whenever these limits are hit the full response/error with status code will be p
 Rate limiting is explained in the Github and Twitter API documentation.
 
 ### Tweets completeness:
-As specified in the Twitter documentation
+Unsure about what could be the reason but unless the repo is very popular I can't tweets consistently,
+However, I made some test using keywords like ExpressJs or NodeJs and I would get the tweets.
