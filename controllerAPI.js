@@ -18,30 +18,27 @@ module.exports = {
             per_page: this.getPerPage(argv), //10
         }
     },
-    getKeyword(argv){
+    getKeyword: function(argv){
 
         // get the -k option or "Football"
-
         let keyword = argv.k || 'Football';
         if(typeof keyword !== 'string'){
             keyword = 'Football';
         }
         return keyword;
     },
-    getPage(argv){
+    getPage: function(argv){
 
         // get the -p option or 1
-
         let page = parseInt(argv.p, 10) || 1;
         if(typeof page !== 'number'){
             page = 1;
         }
         return page;
     },
-    getPerPage(argv){
+    getPerPage: function(argv){
 
         // get the -c option or 10
-
         let per_page = parseInt(argv.c, 10) || 10;
         if(typeof per_page !== 'number'){
             per_page = 10;
@@ -126,7 +123,7 @@ module.exports = {
     getListOfTweets: async function(repoItems){
 
         let start = Date.now();
-        console.log("GET LIST OF TWEETS STARTED AT", start);
+        console.log("GET LIST OF TWEETS___ STARTED AT", start);
 
         let tweets = repoItems.map((repo) => {
             let question = repo.owner.login+'/'+repo.name;
@@ -136,20 +133,14 @@ module.exports = {
                 //if api requests are finished this will be catched as an error
             })
             .catch((err) => {
-                if(err){
-                    console.log(err);
-                }else{
-                    console.log("Output saved to: tweets.json");
-                }
                 console.log("tweets error", repo.owner.login, repo.name,  (Date.now() - start), "ms");
-                console.log(err);
                 return false;
-                //doing this so that the front-end can do something like if(tweets){...}else{...}
            });
         });
 
         return Promise.all(tweets);
     },
+
     saveOutput(output){
         //saving output help function
         jsonfile.writeFile('output.json', output, {spaces: 4},(err) => {

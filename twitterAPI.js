@@ -4,6 +4,7 @@ var rp = require('request-promise');
 module.exports = {
 
     access_token: false,
+
     setAccessToken: async function(){
 
         let options = {
@@ -23,6 +24,7 @@ module.exports = {
         });
         this.access_token = access_token;
     },
+
     getTweets: function(question){
 
         //It is quite hard to get tweets about github small projects,

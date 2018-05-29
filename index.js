@@ -19,12 +19,6 @@ server.get('/CC_sportdec', (req, res) => {
     });
 });
 
-
-
-
-
-
-
 // //TEST
 // controllerAPI.CC_sportdec(argv.keyword, argv.page, argv.per_page).then((resolve) => {
 //     // console.log(resolve);
