@@ -1,7 +1,7 @@
 "use strict";
-
 const githubAPI = require('./githubAPI');
 const twitterAPI = require('./twitterAPI');
+var jsonfile = require('jsonfile');
 
 module.exports = {
 
@@ -11,6 +11,7 @@ module.exports = {
         // -k, "Football" => keyword
         // -p, 1 => page
         // -c, 10 => per_page
+
         return {
             keyword: this.getKeyword(argv), // "Football"
             page: this.getPage(argv), // 1
@@ -18,7 +19,9 @@ module.exports = {
         }
     },
     getKeyword(argv){
+
         // get the -k option or "Football"
+
         let keyword = argv.k || 'Football';
         if(typeof keyword !== 'string'){
             keyword = 'Football';
@@ -26,7 +29,9 @@ module.exports = {
         return keyword;
     },
     getPage(argv){
+
         // get the -p option or 1
+
         let page = parseInt(argv.p, 10) || 1;
         if(typeof page !== 'number'){
             page = 1;
@@ -34,7 +39,9 @@ module.exports = {
         return page;
     },
     getPerPage(argv){
+
         // get the -c option or 10
+
         let per_page = parseInt(argv.c, 10) || 10;
         if(typeof per_page !== 'number'){
             per_page = 10;
@@ -43,20 +50,25 @@ module.exports = {
     },
     CC_sportdec: function(keyword, page, per_page){
 
+        //main controller
+
         return githubAPI.getRateLimit().then((res) => {
 
             if(this.githubRateLimit_OK(res, per_page)){
 
                 return githubAPI.getReposByKeyword(keyword, page, per_page).then((res) => {
-                    return res;
                     let repoItems = JSON.parse(res.body).items;
+
                     //The fastest way to reduce response time: tonitiate the 2 promises: summary and tweets, then..
                     //once both are resolved (resolving in parallel) use map to assign results to each repo leveraging on the index,
                     //there are no push or pops therefore I can assume that it will work 100%
+
                     let summaries = this.getListOfSummaries(repoItems);
                     let tweets = this.getListOfTweets(repoItems);
+
                     //The most expensive computation is getting the readme,
                     //tested with 20 repos and worst result to resolve both promises was 898 ms from home connection
+
                     return Promise.all([summaries, tweets]).then((res) => {
                         //zipping repos summaries and tweets
                         return repoItems.map((repo, index) => {
@@ -83,11 +95,14 @@ module.exports = {
         // Doing 3 checks:
         // 1) I want to make sure I have reached the github endpoint in the previous call
         // 2) I want to make sure I have at least 1 search API left to run the repo search
-        // 3) I want to make sure I have enough core APIs to fetch the README files later on,
+        // 3) I want to make sure I have enough core APIs to fetch the README files later on
+
         let search_remaining = JSON.parse(res.body).resources.search.remaining > 0 || 0; //something unexpected?
         let core_remaining = JSON.parse(res.body).resources.core.remaining || 0; //something unexpected?
+
         // console.log('search_remaining', search_remaining > 0);
         // console.log('core_remaining', core_remaining >= per_page);
+
         return res.statusCode === 200 && search_remaining > 0 && core_remaining >= per_page; //boolean
     },
     getListOfSummaries: async function(repoItems){
@@ -111,6 +126,7 @@ module.exports = {
 
         let start = Date.now();
         console.log("GET LIST OF TWEETS STARTED AT", start);
+
         let tweets = repoItems.map((repo) => {
             let question = repo.owner.login+'/'+repo.name;
             return twitterAPI.getTweets(question).then((res) => {
@@ -119,6 +135,11 @@ module.exports = {
                 //if api requests are finished this will be catched as an error
             })
             .catch((err) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    console.log("Output saved to: tweets.json");
+                }
                 console.log("tweets error", repo.owner.login, repo.name,  (Date.now() - start), "ms");
                 console.log(err);
                 return false;
@@ -127,5 +148,17 @@ module.exports = {
         });
 
         return Promise.all(tweets);
+    },
+    saveOutput(output){
+        //saving output help function
+        jsonfile.writeFile('output.json', output, {spaces: 4},(err) => {
+            if(err){
+                console.log('Error while saving file');
+            }else{
+                console.log("Output saved to: output.json");
+            }
+        });
+
     }
+
 }

@@ -28,20 +28,23 @@ You can run the program from command line by typing:
 ```
 node index.js
 ```
-or
-```
-npm start
-```
-By default the program will fetch the top 10 starred Football repos on github, however you can pass up to 3 arguments in the following order:
-keyword, page, per_page
-per_page max number is 10 and minimum is 1: if this condition is not respected it will default to 10
 
-For example:
+You can also pass 3 optional flags, they don't need to be in sequential order:
+
+-k   => keyword (it will default to "Football")
+
+-c   => results per page (it will default to 10, max is 10)
+
+-p   => the page number (it will default to 1)
+
+Example with flags: (fetch 7 repos about tennis from the 3rd search page in github)
 
 ```
-node index.js tennis 5 3
+node index.js -k Tennis -c 7 -p 3
 ```
-This command will fetch 3 repos about tennis on the fifth page of the github search results.
+
+once the script has run, the server will serve  the response at http://localhost:3000/CC_sportec
+
 
 ### Limits:
 This program has API rate and query limits relative to Github and Twitter APIs.
