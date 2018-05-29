@@ -129,7 +129,7 @@ module.exports = {
         console.log("GET LIST OF TWEETS STARTED AT", start);
 
         let tweets = repoItems.map((repo) => {
-            let question = encodeURI(repo.owner.login+'/'+repo.name);
+            let question = repo.owner.login+'/'+repo.name;
             return twitterAPI.getTweets(question).then((res) => {
                 console.log("tweets ok", repo.owner.login, repo.name, (Date.now() - start), "ms");
                 return res;

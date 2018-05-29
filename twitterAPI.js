@@ -32,6 +32,7 @@ module.exports = {
         //TwitterClient encodes query parameters by default.
 
         if(this.access_token){
+            question = encodeURI(question);
             let url =  encodeURI("https://api.twitter.com/1.1/search/tweets.json?q="+question+"&count=10&lang=eng&result_type=recent&include_entities=true");
             let options = {
                 method: 'GET',
