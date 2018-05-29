@@ -52,5 +52,5 @@ Whenever these limits are hit the full response/error with status code will be p
 Rate limiting is explained in the Github and Twitter API documentation.
 
 ### Tweets completeness:
-Unsure about what could be the reason but unless the repo is very popular I can't tweets consistently,
-However, I made some test using keywords like ExpressJs or NodeJs and I would get the tweets.
+Unsure about what could be the reason but unless the repo is very popular I can't get tweets consistently,
+However, I made some tests using keywords like ExpressJs or NodeJs and I can get those tweets.
